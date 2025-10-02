@@ -1,0 +1,94 @@
+// Prisma schema for SQLite (default example)
+// Change provider and url in datasource if using another database
+
+datasource db {
+  provider = "postgresql" // Đổi thành "postgresql" hoặc "mysql" nếu dùng DB khác
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  name         String?
+  password     String
+  role         UserRole      @default(USER)
+  // Basic profile additions
+  phone        String?
+  organization String?
+  jobTitle     String?
+
+  registrations Registration[]
+  eventRoles   EventRole[]
+  notifications Notification[]
+  organizedEvents Event[]     @relation("EventOrganizer")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model Event {
+  id           Int           @id @default(autoincrement())
+  name         String
+  description  String?
+  startTime    DateTime
+  endTime      DateTime
+  location     String?
+  imageUrl     String?
+  status       EventStatus   @default(PENDING)
+  organizerId  Int?
+  organizer    User?         @relation("EventOrganizer", fields: [organizerId], references: [id])
+  qrCode       String?       @unique
+  shareUrl     String?
+  registrations Registration[]
+  eventRoles   EventRole[]
+  notifications Notification[]
+}
+
+enum EventStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model Registration {
+  id           Int           @id @default(autoincrement())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int
+  event        Event         @relation(fields: [eventId], references: [id])
+  eventId      Int
+  qrCode       String?
+  checkedIn    Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+}
+
+model Notification {
+  id           Int           @id @default(autoincrement())
+  event        Event?        @relation(fields: [eventId], references: [id])
+  eventId      Int?
+  user         User?         @relation(fields: [userId], references: [id])
+  userId       Int?
+  message      String
+  sentAt       DateTime      @default(now())
+}
+
+model EventRole {
+  id           Int           @id @default(autoincrement())
+  user         User          @relation(fields: [userId], references: [id])
+  userId       Int
+  event        Event         @relation(fields: [eventId], references: [id])
+  eventId      Int
+  role         Role
+}
+
+enum Role {
+  OWNER
+  ADMIN
+  MEMBER
+}
