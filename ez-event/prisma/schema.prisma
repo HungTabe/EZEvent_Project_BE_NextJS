@@ -15,7 +15,7 @@ model User {
   email        String        @unique
   name         String?
   password     String
-  role         UserRole      @default(USER)
+  role         UserRole      @default(STUDENT)
   // Basic profile additions
   phone        String?
   organization String?
@@ -25,11 +25,13 @@ model User {
   eventRoles   EventRole[]
   notifications Notification[]
   organizedEvents Event[]     @relation("EventOrganizer")
+  createdEvents Event[]       @relation("EventCreator")
 }
 
 enum UserRole {
+  STUDENT
+  ORGANIZER
   ADMIN
-  USER
 }
 
 model Event {
@@ -41,6 +43,8 @@ model Event {
   location     String?
   imageUrl     String?
   status       EventStatus   @default(PENDING)
+  createdBy    Int
+  creator      User          @relation("EventCreator", fields: [createdBy], references: [id])
   organizerId  Int?
   organizer    User?         @relation("EventOrganizer", fields: [organizerId], references: [id])
   qrCode       String?       @unique

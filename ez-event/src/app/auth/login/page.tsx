@@ -40,8 +40,10 @@ export default function LoginPage() {
     setMessage(data.message || data.error || "");
     if (data.user?.role === "ADMIN") {
       router.push("/admin");
-    } else if (data.user?.role === "USER") {
-      router.push("/user");
+    } else if (data.user?.role === "ORGANIZER") {
+      router.push("/organizer");
+    } else if (data.user?.role === "STUDENT") {
+      router.push("/student");
     }
   }
 

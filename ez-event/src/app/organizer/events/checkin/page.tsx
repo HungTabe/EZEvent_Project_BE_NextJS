@@ -114,9 +114,7 @@ export default function CheckinPage() {
               {showScanner && (
                 <div ref={scannerRef} className="rounded-lg overflow-hidden border" />
               )}
-              <div className="text-center text-gray-500 text-sm mt-2">
-                Yêu cầu HTTPS (ngrok OK). Hoặc nhập mã thủ công bên dưới.
-              </div>
+              
             </div>
 
             {/* Manual QR Input */}

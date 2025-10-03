@@ -66,71 +66,56 @@ export default function UserDashboard() {
         
         setUser(currentUser);
 
-        // Fetch user's registrations
-        const res = await fetch(`/api/user/registrations?userId=${currentUser.id}`);
-        if (res.ok) {
-          const data = await res.json();
+        // Fetch user's registrations from API
+        const res = await fetch(`/api/user/registrations?userId=${currentUser.id}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.registrations) {
           // Chuyển đổi dữ liệu để phù hợp với interface
-          const userRegistrations = data.registrations?.map((reg: { id: number; eventId: number; qrCode: string; checkedIn: boolean; createdAt: string; event?: { id: number; name: string; startTime: string; endTime: string; location?: string; status: string } }) => ({
+          const userRegistrations = data.registrations.map((reg: {
+            id: number;
+            eventId: number;
+            qrCode: string | null;
+            checkedIn: boolean;
+            createdAt: string;
+            event?: {
+              id: number;
+              name: string;
+              description?: string;
+              startTime: string;
+              endTime: string;
+              location?: string;
+              status?: string;
+            };
+          }) => ({
             id: reg.id,
             eventId: reg.eventId,
-            qrCode: reg.qrCode,
-            checkedIn: reg.checkedIn,
+            qrCode: reg.qrCode || "",
+            checkedIn: reg.checkedIn || false,
             createdAt: reg.createdAt,
             event: {
               id: reg.event?.id || reg.eventId,
               name: reg.event?.name || "Sự kiện không xác định",
               startTime: reg.event?.startTime || new Date().toISOString(),
               endTime: reg.event?.endTime || new Date().toISOString(),
-              location: reg.event?.location,
+              location: reg.event?.location || "",
               status: reg.event?.status || "APPROVED"
             }
-          })) || [];
+          }));
 
           setRegistrations(userRegistrations);
         } else {
-          // Nếu không lấy được dữ liệu, sử dụng mock data
-          setRegistrations([
-            {
-              id: 1,
-              eventId: 1,
-              qrCode: "abc123def456",
-              checkedIn: false,
-              createdAt: "2024-01-15T10:00:00Z",
-              event: {
-                id: 1,
-                name: "Workshop React.js",
-                startTime: "2024-01-20T09:00:00Z",
-                endTime: "2024-01-20T17:00:00Z",
-                location: "Hà Nội",
-                status: "APPROVED"
-              }
-            },
-            {
-              id: 2,
-              eventId: 2,
-              qrCode: "xyz789uvw012",
-              checkedIn: true,
-              createdAt: "2024-01-10T14:30:00Z",
-              event: {
-                id: 2,
-                name: "Conference AI 2024",
-                startTime: "2024-01-12T08:00:00Z",
-                endTime: "2024-01-12T18:00:00Z",
-                location: "TP.HCM",
-                status: "APPROVED"
-              }
-            }
-          ]);
+          console.error('Error fetching registrations:', data.error);
+          setRegistrations([]);
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        // Fallback to mock data
-        setUser({
-          id: 1,
-          name: "Nguyễn Văn A",
-          email: "user@example.com"
-        });
+        // Set empty data nếu có lỗi
         setRegistrations([]);
       } finally {
         setLoading(false);
@@ -221,9 +206,16 @@ export default function UserDashboard() {
     <UserLayout>
       <div className="p-6">
         {/* Page Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Trang cá nhân</h1>
-          <p className="text-gray-600 mt-1">Quản lý sự kiện đã đăng ký và QR code cá nhân</p>
+        <div className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-100 mb-6">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-sm">
+              <span className="text-2xl text-white">👤</span>
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-gray-900">Trang cá nhân</h1>
+              <p className="text-gray-600">Quản lý sự kiện đã đăng ký và QR code cá nhân</p>
+            </div>
+          </div>
         </div>
         {/* Quick QR Access for Upcoming Events */}
         {(() => {
@@ -269,64 +261,86 @@ export default function UserDashboard() {
         })()}
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-md">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-12">
+          <div className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center mr-4 shadow-sm">
                 <span className="text-2xl">📅</span>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-800">{registrations.length}</div>
-                <div className="text-sm text-gray-600">Sự kiện đã đăng ký</div>
+                <div className="text-2xl font-extrabold tracking-tight text-gray-900">{registrations.length}</div>
+                <div className="text-sm font-medium text-gray-600">Sự kiện đã đăng ký</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-md">
+          <div className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-green-100 text-green-700 rounded-xl flex items-center justify-center mr-4 shadow-sm">
                 <span className="text-2xl">✅</span>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-800">
+                <div className="text-2xl font-extrabold tracking-tight text-gray-900">
                   {registrations.filter(r => r.checkedIn).length}
                 </div>
-                <div className="text-sm text-gray-600">Đã tham gia</div>
+                <div className="text-sm font-medium text-gray-600">Đã tham gia</div>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 shadow-md">
+          <div className="bg-white rounded-2xl p-6 shadow-sm ring-1 ring-gray-100 hover:shadow-md transition-shadow">
             <div className="flex items-center">
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-yellow-100 text-yellow-700 rounded-xl flex items-center justify-center mr-4 shadow-sm">
                 <span className="text-2xl">⏳</span>
               </div>
               <div>
-                <div className="text-2xl font-bold text-gray-800">
+                <div className="text-2xl font-extrabold tracking-tight text-gray-900">
                   {registrations.filter(r => !r.checkedIn).length}
                 </div>
-                <div className="text-sm text-gray-600">Chưa tham gia</div>
+                <div className="text-sm font-medium text-gray-600">Chưa tham gia</div>
               </div>
             </div>
           </div>
         </div>
 
+        {/* Quick Actions */}
+        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 sm:p-8 mb-6">
+          <h3 className="text-2xl font-bold text-gray-900 mb-6">Thao tác nhanh</h3>
+          <div className="flex flex-wrap gap-4">
+            <Link 
+              href="/student/events" 
+              className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+            >
+              <span className="mr-2">🎫</span>
+              Khám phá sự kiện
+            </Link>
+            <button 
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition-all duration-300"
+            >
+              <span className="mr-2">🔄</span>
+              Làm mới
+            </button>
+          </div>
+        </div>
+
         {/* Search and Filter */}
-        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-6 mb-6">
           <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+            <div className="flex-1 relative">
+              <span className="absolute left-3 top-3 text-gray-400">🔍</span>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Tìm kiếm sự kiện..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-3 bg-white rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
               />
             </div>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as 'all' | 'upcoming' | 'past' | 'checkedIn')}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-4 py-3 bg-white rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all"
             >
               <option value="all">Tất cả sự kiện</option>
               <option value="upcoming">Sắp diễn ra</option>
@@ -337,10 +351,10 @@ export default function UserDashboard() {
         </div>
 
         {/* Events List */}
-        <div className="bg-white rounded-xl shadow-md p-8">
+        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-gray-100 p-8">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-800">Sự kiện đã đăng ký</h2>
-            <span className="text-sm text-gray-500">{filteredRegistrations.length} / {registrations.length} sự kiện</span>
+            <h2 className="text-2xl font-bold text-gray-900">Sự kiện đã đăng ký</h2>
+            <span className="text-sm font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">{filteredRegistrations.length} / {registrations.length} sự kiện</span>
           </div>
           
           {filteredRegistrations.length === 0 ? (

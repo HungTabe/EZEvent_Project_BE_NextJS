@@ -15,8 +15,8 @@ function NavItem({ href, label, icon, badge }: { href: string; label: string; ic
   return (
     <Link
       href={href}
-      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-        active ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'
+      className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+        active ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg' : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
       }`}
     >
       <div className="flex items-center gap-2">
@@ -24,7 +24,7 @@ function NavItem({ href, label, icon, badge }: { href: string; label: string; ic
         <span>{label}</span>
       </div>
       {badge !== undefined && badge > 0 && (
-        <span className={`px-2 py-1 text-xs rounded-full ${active ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800'}`}>
+        <span className={`px-2 py-1 text-xs rounded-full font-medium ${active ? 'bg-white/20 text-white' : 'bg-blue-100 text-blue-800'}`}>
           {badge}
         </span>
       )}
@@ -67,9 +67,9 @@ export function UserSidebar({ mobileOpen = false, onClose }: { mobileOpen?: bool
   const SidebarContent = (
     <div className="h-full flex flex-col">
       {/* User Profile */}
-      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl">
+      <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-100">
         <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+          <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold shadow-sm">
             {(user?.name?.charAt(0) ?? user?.email?.charAt(0) ?? '?').toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
@@ -86,8 +86,8 @@ export function UserSidebar({ mobileOpen = false, onClose }: { mobileOpen?: bool
       {/* Navigation */}
       <div className="text-xs uppercase text-gray-400 px-2 mb-2">Hoạt động</div>
       <nav className="space-y-1 flex-1">
-        <NavItem href="/events" label="Khám phá sự kiện" icon="🎫" />
-        <NavItem href="/user" label="Trang cá nhân" icon="👤" badge={registrationCount} />
+        <NavItem href="/student" label="Trang cá nhân" icon="�" badge={registrationCount} />
+        <NavItem href="/student/events" label="Khám phá sự kiện" icon="🎫" />
       </nav>
 
       {/* Quick Actions */}
@@ -109,13 +109,13 @@ export function UserSidebar({ mobileOpen = false, onClose }: { mobileOpen?: bool
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden md:block w-64 bg-white border-r min-h-screen p-4 sticky top-0">
+      <aside className="hidden md:block w-64 bg-white border-r border-gray-200 min-h-screen p-4 sticky top-0 shadow-sm">
         <div className="mb-6">
-          <Link href="/events" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <Link href="/student" className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center shadow-sm">
               <span className="text-white font-bold text-sm">EZ</span>
             </div>
-            <span className="text-lg font-bold text-gray-800">EZ Event</span>
+            <span className="text-lg font-extrabold tracking-tight text-gray-900">EZEvent</span>
           </Link>
         </div>
         {SidebarContent}
@@ -125,13 +125,13 @@ export function UserSidebar({ mobileOpen = false, onClose }: { mobileOpen?: bool
       {mobileOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-          <aside className="absolute left-0 top-0 h-full w-72 bg-white p-4 shadow-xl">
+          <aside className="absolute left-0 top-0 h-full w-72 bg-white p-4 shadow-2xl">
             <div className="mb-4 flex items-center justify-between">
-              <Link href="/events" className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <Link href="/student" className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center shadow-sm">
                   <span className="text-white font-bold text-sm">EZ</span>
                 </div>
-                <span className="text-lg font-bold text-gray-800">EZ Event</span>
+                <span className="text-lg font-extrabold tracking-tight text-gray-900">EZEvent</span>
               </Link>
               <button aria-label="Đóng" className="text-gray-600" onClick={onClose}>✕</button>
             </div>
