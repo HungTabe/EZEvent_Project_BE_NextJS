@@ -130,7 +130,7 @@ export default function OrganizerEventsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
-                {filteredEvents.map((event, index) => {
+                {filteredEvents.map((event) => {
                   const eventStatus = getEventStatus(event.startTime, event.endTime);
                   return (
                     <tr key={event.id} className="hover:bg-white/50 transition-colors">

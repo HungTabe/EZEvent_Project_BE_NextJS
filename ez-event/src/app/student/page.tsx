@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import UserLayout from "../_components/UserLayout";
 
 interface User {
@@ -26,7 +27,7 @@ interface Registration {
 }
 
 export default function UserDashboard() {
-  const [user, setUser] = useState<User | null>(null);
+  const [, setUser] = useState<User | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRegistration, setSelectedRegistration] = useState<Registration | null>(null);
@@ -455,12 +456,12 @@ export default function UserDashboard() {
                   
                   <div className="mb-4 bg-gray-50 p-4 rounded-lg">
                     {qrImageUrl ? (
-                      <img
+                      <Image
                         src={qrImageUrl}
                         alt="Personal QR Code"
                         className="mx-auto border-2 border-gray-200 rounded-lg"
-                        width="250"
-                        height="250"
+                        width={250}
+                        height={250}
                       />
                     ) : (
                       <div className="w-64 h-64 mx-auto bg-gray-200 rounded-lg flex items-center justify-center">

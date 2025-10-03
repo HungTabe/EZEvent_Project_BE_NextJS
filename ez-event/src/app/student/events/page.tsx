@@ -184,7 +184,12 @@ export default function StudentEventsPage() {
                   {/* Event Header */}
                   <div className="p-6 pb-4">
                     <div className="flex items-start justify-between mb-3">
-                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{event.name}</h3>
+                      <Link 
+                        href={`/student/events/${event.id}`}
+                        className="text-lg font-semibold text-gray-900 line-clamp-2 hover:text-blue-600 transition-colors cursor-pointer"
+                      >
+                        {event.name}
+                      </Link>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${eventStatus.color} flex-shrink-0 ml-2`}>
                         {eventStatus.label}
                       </span>
@@ -220,36 +225,36 @@ export default function StudentEventsPage() {
                   
                   {/* Action Button */}
                   <div className="px-6 pb-6">
-                    {event.isRegistered ? (
-                      <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <Link 
+                        href={`/student/events/${event.id}`}
+                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+                      >
+                        Chi tiết
+                      </Link>
+                      {event.isRegistered ? (
                         <button className="flex-1 bg-green-100 text-green-700 px-4 py-2 rounded-xl font-medium cursor-default">
                           ✓ Đã đăng ký
                         </button>
-                        <Link 
-                          href="/student"
-                          className="px-4 py-2 bg-blue-100 text-blue-700 rounded-xl font-medium hover:bg-blue-200 transition-colors"
+                      ) : (
+                        <button
+                          onClick={() => handleRegister(event.id)}
+                          disabled={registering === event.id || eventStatus.status === 'ended'}
+                          className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Xem QR
-                        </Link>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => handleRegister(event.id)}
-                        disabled={registering === event.id || eventStatus.status === 'ended'}
-                        className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-4 py-2 rounded-xl font-medium hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {registering === event.id ? (
-                          <span className="flex items-center justify-center gap-2">
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                            Đang đăng ký...
-                          </span>
-                        ) : eventStatus.status === 'ended' ? (
-                          "Đã kết thúc"
-                        ) : (
-                          "Đăng ký tham gia"
-                        )}
-                      </button>
-                    )}
+                          {registering === event.id ? (
+                            <span className="flex items-center justify-center gap-2">
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                              Đang đăng ký...
+                            </span>
+                          ) : eventStatus.status === 'ended' ? (
+                            "Đã kết thúc"
+                          ) : (
+                            "Đăng ký tham gia"
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               );

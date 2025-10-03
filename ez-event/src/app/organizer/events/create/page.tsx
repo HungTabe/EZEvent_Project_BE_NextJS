@@ -9,6 +9,7 @@ export default function CreateEventPage() {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [location, setLocation] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function CreateEventPage() {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
       },
-      body: JSON.stringify({ name, description, startTime, endTime, location }),
+      body: JSON.stringify({ name, description, startTime, endTime, location, imageUrl }),
     });
     const data = await res.json();
     
@@ -35,8 +36,8 @@ export default function CreateEventPage() {
       setMessage(data.error);
       setLoading(false);
     } else {
-      setMessage("Tạo sự kiện thành công!");
-      setTimeout(() => router.push("/organizer/events"), 1500);
+      setMessage("🎉 Tạo sự kiện thành công và đã được phê duyệt tự động! QR code đã sẵn sàng.");
+      setTimeout(() => router.push("/organizer/events"), 2000);
     }
   }
 
@@ -106,6 +107,17 @@ export default function CreateEventPage() {
                   placeholder="Nơi tổ chức sự kiện..."
                   value={location}
                   onChange={e => setLocation(e.target.value)}
+                  className="w-full px-4 py-3 bg-white rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-900 placeholder-gray-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">URL Ảnh sự kiện</label>
+                <input
+                  type="url"
+                  placeholder="https://example.com/image.jpg"
+                  value={imageUrl}
+                  onChange={e => setImageUrl(e.target.value)}
                   className="w-full px-4 py-3 bg-white rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-gray-900 placeholder-gray-500"
                 />
               </div>

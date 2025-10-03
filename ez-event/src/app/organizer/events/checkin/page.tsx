@@ -51,6 +51,9 @@ export default function CheckinPage() {
   // Initialize/cleanup html5-qrcode scanner
   useEffect(() => {
     let isMounted = true;
+    // Copy ref value to avoid stale closure warning
+    const containerElement = scannerRef.current;
+    
     async function setup() {
       if (!showScanner || !scannerRef.current) return;
       const { Html5Qrcode } = await import('html5-qrcode');
@@ -78,9 +81,9 @@ export default function CheckinPage() {
         try { qr.stop().then(() => qr.clear()); } catch {}
       }
       html5QrcodeRef.current = null;
-      const container = scannerRef.current;
-      if (container) {
-        container.innerHTML = '';
+      // Cleanup container element
+      if (containerElement) {
+        containerElement.innerHTML = '';
       }
     };
   }, [showScanner, performCheckin]);

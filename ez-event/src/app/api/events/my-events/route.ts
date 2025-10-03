@@ -12,7 +12,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; role: string };
     
     const events = await prisma.event.findMany({
       where: { createdBy: decoded.userId },
@@ -20,7 +20,8 @@ export async function GET(request: Request) {
     });
     
     return NextResponse.json({ events });
-  } catch (err) {
+  } catch (error) {
+    console.error('Error fetching my events:', error);
     return NextResponse.json({ error: 'Token không hợp lệ' }, { status: 401 });
   }
 }

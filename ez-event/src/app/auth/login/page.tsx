@@ -27,7 +27,7 @@ export default function LoginPage() {
     let data: { token?: string; user?: User; message?: string; error?: string } = {};
     try {
       data = await res.json();
-    } catch (err) {
+    } catch {
       setMessage("Lỗi server hoặc không nhận được phản hồi hợp lệ.");
       return;
     }

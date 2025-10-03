@@ -12,14 +12,14 @@ export async function POST(request: Request) {
   }
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: number; role: string };
     
     // Chỉ ORGANIZER và ADMIN mới được tạo sự kiện
     if (decoded.role !== 'ORGANIZER' && decoded.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Không có quyền tạo sự kiện' }, { status: 403 });
     }
 
-    const { name, description, startTime, endTime, location } = await request.json();
+    const { name, description, startTime, endTime, location, imageUrl } = await request.json();
     if (!name || !startTime || !endTime) {
       return NextResponse.json({ error: 'Thiếu tên, thời gian bắt đầu hoặc kết thúc.' }, { status: 400 });
     }
@@ -31,12 +31,29 @@ export async function POST(request: Request) {
         startTime: new Date(startTime),
         endTime: new Date(endTime),
         location,
+        imageUrl,
         createdBy: decoded.userId,
+        // ORGANIZER và ADMIN tự động được approved, không cần chờ phê duyệt
+        status: decoded.role === 'ORGANIZER' || decoded.role === 'ADMIN' ? 'APPROVED' : 'PENDING',
       },
     });
 
-    return NextResponse.json({ message: 'Tạo sự kiện thành công!', event });
-  } catch (err) {
-    return NextResponse.json({ error: 'Token không hợp lệ' }, { status: 401 });
+    // Tạo share URL và QR code sau khi có event ID
+    const shareUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/student/events/${event.id}`;
+    const qrCode = `QR_${event.id}_${Date.now()}`;
+
+    // Cập nhật event với shareUrl và qrCode
+    const updatedEvent = await prisma.event.update({
+      where: { id: event.id },
+      data: {
+        shareUrl,
+        qrCode,
+      },
+    });
+
+    return NextResponse.json({ message: 'Tạo sự kiện thành công!', event: updatedEvent });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    return NextResponse.json({ error: 'Token không hợp lệ hoặc lỗi server' }, { status: 401 });
   }
 }
